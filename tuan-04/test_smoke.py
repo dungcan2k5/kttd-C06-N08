@@ -1,30 +1,41 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-import time
 
-def test_the_internet_title():
-    # 1. Khởi tạo trình duyệt Chrome
-    driver = webdriver.Chrome()
-    
-    try:
-        # 2. Điều hướng tới trang web thực hành
-        driver.get("https://the-internet.herokuapp.com/")
-        
-        # Maximize cửa sổ để load đầy đủ giao diện
-        driver.maximize_window()
-        
-        # 3. Lấy title của trang hiện tại
-        actual_title = driver.title
-        expected_title = "The Internet SAI"
-        
-        # 4. Kiểm tra tiêu đề trang có khớp với mong đợi không
-        assert actual_title == expected_title, f"Sai title rồi: nhận '{actual_title}' nhưng mong đợi '{expected_title}'"
-        print("\nSmoke test PASSED: Tiêu đề trang khớp hoàn toàn.")
-        
-    finally:
-        # 5. Đóng trình duyệt sau khi test xong để giải phóng tài nguyên
-        driver.quit()
+# Khởi tạo trình duyệt Chrome bằng Selenium WebDriver.
+# Biến driver được dùng để điều khiển trình duyệt trong suốt bài kiểm thử.
+driver = webdriver.Chrome()
 
-if __name__ == "__main__":
-    test_the_internet_title()
+try:
+    # Mở trang web cần kiểm thử bằng URL được cung cấp.
+    driver.get("https://the-internet.herokuapp.com/")
+
+    # Lấy tiêu đề của trang web hiện tại.
+    # Giá trị trả về được lưu vào biến title_page.
+    title_page = driver.title
+
+    # In tiêu đề thực tế ra Terminal để quan sát kết quả.
+    print("Tiêu đề trang:", title_page)
+
+    # Khai báo tiêu đề mong đợi của trang web.
+    # Đây là giá trị dùng để so sánh với tiêu đề thực tế.
+    true_title = "The Internet"
+
+    # Kiểm tra tiêu đề thực tế có bằng tiêu đề mong đợi hay không.
+    # Nếu điều kiện đúng, chương trình tiếp tục chạy.
+    # Nếu điều kiện sai, AssertionError được phát sinh và thông báo
+    # sẽ cho biết tiêu đề mong đợi và tiêu đề thực tế.
+    assert title_page == true_title, (
+        f"Tiêu đề sai! Mong đợi: '{true_title}', "
+        f"Thực tế: '{title_page}'"
+    )
+
+    # Chỉ in TEST PASSED khi câu lệnh assert phía trên không thất bại.
+    print("TEST PASSED")
+
+    # Tạm dừng chương trình để người dùng quan sát trình duyệt.
+    # Nhấn Enter để tiếp tục và kết thúc bài kiểm thử.
+    input("Nhấn Enter để đóng trình duyệt...")
+
+finally:
+    # Luôn thực hiện khi rời khỏi khối try, kể cả khi có lỗi.
+    # Đóng toàn bộ cửa sổ thuộc phiên WebDriver và giải phóng tài nguyên.
+    driver.quit()
