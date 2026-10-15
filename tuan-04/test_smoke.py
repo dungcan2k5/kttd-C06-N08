@@ -16,11 +16,11 @@ def test_the_internet_title():
         
         # 3. Lấy title của trang hiện tại
         actual_title = driver.title
-        expected_title = "The Internet SAI"
+        expected_title = "The Internet"
         
         # 4. Kiểm tra tiêu đề trang có khớp với mong đợi không
-        assert actual_title == expected_title, f"Sai title rồi: nhận '{actual_title}' nhưng mong đợi '{expected_title}'"
-        print("\nSmoke test PASSED: Tiêu đề trang khớp hoàn toàn.")
+        assert actual_title == expected_title, f"Title mismatch: got '{actual_title}' but expected '{expected_title}'"
+        print("\nSmoke test PASSED: Title matched.")
         
     finally:
         # 5. Đóng trình duyệt sau khi test xong để giải phóng tài nguyên
