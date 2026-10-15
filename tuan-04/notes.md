@@ -27,12 +27,15 @@
 - Nắm được quy trình đẩy code lên GitHub qua Pull Request bằng nhánh phụ (branch) để làm việc nhóm.
 
 ### Trả lời câu hỏi đọc tài liệu:
-**Một script Selenium gồm những bước nào?**
-   - Bước 1: Khởi tạo trình duyệt (ví dụ: `driver = webdriver.Chrome()`).
-   - Bước 2: Điều hướng URL trang web (ví dụ: `driver.get("link_trang_web")`).
-   - Bước 3: Tìm phần tử và lấy dữ liệu trên trang (ví dụ: `driver.title`).
+1. **Một script Selenium gồm những bước nào?**
+   - Bước 1: Khởi tạo trình duyệt (`driver = webdriver.Chrome()`).
+   - Bước 2: Điều hướng URL trang web (`driver.get(...)`).
+   - Bước 3: Tìm phần tử và lấy dữ liệu trên trang (`driver.title`, `find_element`).
    - Bước 4: Kiểm tra kết quả, so sánh thực tế với mong đợi (Assert).
-   - Bước 5: Đóng trình duyệt (Teardown) bằng `driver.quit()`.
+   - Bước 5: Đóng phiên làm việc (`driver.quit()`).
+2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
+   - Pytest tự động tìm và chạy các file kiểm thử có tên bắt đầu bằng `test_*.py` hoặc kết thúc bằng `*_test.py`.
+   - Bên trong file, các hàm kiểm thử bắt buộc phải bắt đầu bằng tiền tố `test_` (ví dụ: `def test_the_internet_title():`).
 
 ### Việc sử dụng AI
 - **Đã hỏi AI điều gì:** Hỏi cách sửa lỗi "The browser path is not a valid file" khi Selenium không tìm thấy Chrome trên ổ C và cách tạo Pull Request.
