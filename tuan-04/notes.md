@@ -18,3 +18,22 @@
    - Hàm test bắt đầu bằng `test_*`.
 
 ---
+
+## Nguyễn Phúc Hưng
+
+### Điều đã học
+- Hiểu được cấu trúc 5 bước cơ bản của một kịch bản kiểm thử Selenium.
+- Biết cách tìm và xác định lỗi sai cố ý trong đoạn code kiểm thử để sửa lại cho đúng.
+- Nắm được quy trình đẩy code lên GitHub qua Pull Request bằng nhánh phụ (branch) để làm việc nhóm.
+
+### Trả lời câu hỏi đọc tài liệu:
+**Một script Selenium gồm những bước nào?**
+   - Bước 1: Khởi tạo trình duyệt (ví dụ: `driver = webdriver.Chrome()`).
+   - Bước 2: Điều hướng URL trang web (ví dụ: `driver.get("link_trang_web")`).
+   - Bước 3: Tìm phần tử và lấy dữ liệu trên trang (ví dụ: `driver.title`).
+   - Bước 4: Kiểm tra kết quả, so sánh thực tế với mong đợi (Assert).
+   - Bước 5: Đóng trình duyệt (Teardown) bằng `driver.quit()`.
+
+### Việc sử dụng AI
+- **Đã hỏi AI điều gì:** Hỏi cách sửa lỗi "The browser path is not a valid file" khi Selenium không tìm thấy Chrome trên ổ C và cách tạo Pull Request.
+- **Hiểu thêm được gì:** Hiểu được cách cấu hình đường dẫn thủ công cho WebDriver khi trình duyệt không nằm ở vị trí mặc định và cách sử dụng quy trình Git chuẩn trong làm việc nhóm.
