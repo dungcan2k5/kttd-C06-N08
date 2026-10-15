@@ -11,14 +11,16 @@ def test_the_internet_title():
         # 2. Điều hướng tới trang web thực hành
         driver.get("https://the-internet.herokuapp.com/")
         
-        # Maximize cửa sổ để load đầy đủ giao diện
+        # Maximize (phóng to) cửa sổ để load đầy đủ giao diện
         driver.maximize_window()
         
-        # 3. Lấy title của trang hiện tại
+        # 3. Lấy title của trang hiện tại (Đọc tiêu đề trang web)
         actual_title = driver.title
-        expected_title = "The Internet SAI"
+        # Đây là tiêu đề mình kỳ vọng (đã sửa lại thành đúng để test pass)
+        expected_title = "The Internet"
         
         # 4. Kiểm tra tiêu đề trang có khớp với mong đợi không
+        # Nếu không bằng thì quăng lỗi ra màn hình
         assert actual_title == expected_title, f"Sai title rồi: nhận '{actual_title}' nhưng mong đợi '{expected_title}'"
         print("\nSmoke test PASSED: Tiêu đề trang khớp hoàn toàn.")
         
