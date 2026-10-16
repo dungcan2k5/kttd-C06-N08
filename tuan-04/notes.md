@@ -1,6 +1,6 @@
 # Ghi chú tuần 04
 
-## Phùng Mạnh Dũng
+## Phùng Dũng
 
 ### Điều đã học
 - Đã cài đặt và làm quen với Selenium WebDriver, chạy test case cơ bản trên Chrome.
