@@ -1,43 +1,32 @@
-
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+import time
 
-def test_title_internet():
-    # Khởi tạo trình duyệt Chrome bằng Selenium WebDriver.
-    # Biến driver được dùng để điều khiển trình duyệt trong suốt bài kiểm thử.
+def test_the_internet_title():
+    # 1. Khởi tạo trình duyệt Chrome
     driver = webdriver.Chrome()
-
+    
     try:
-        # Mở trang web cần kiểm thử bằng URL được cung cấp.
+        # 2. Điều hướng tới trang web thực hành
         driver.get("https://the-internet.herokuapp.com/")
-
-        # Lấy tiêu đề của trang web hiện tại.
-        # Giá trị trả về được lưu vào biến title_page.
-        title_page = driver.title
-
-        # In tiêu đề thực tế ra Terminal để quan sát kết quả.
-        print("Tiêu đề trang:", title_page)
-
-        # Khai báo tiêu đề mong đợi của trang web.
-        # Đây là giá trị dùng để so sánh với tiêu đề thực tế.
-        true_title = "The Internet"
-
-        # Kiểm tra tiêu đề thực tế có bằng tiêu đề mong đợi hay không.
-        # Nếu điều kiện đúng, chương trình tiếp tục chạy.
-        # Nếu điều kiện sai, AssertionError được phát sinh và thông báo
-        # sẽ cho biết tiêu đề mong đợi và tiêu đề thực tế.
-        assert title_page == true_title, (
-            f"Tiêu đề sai! Mong đợi: '{true_title}', "
-            f"Thực tế: '{title_page}'"
-        )
-
-        # Chỉ in TEST PASSED khi câu lệnh assert phía trên không thất bại.
-        print("TEST PASSED")
-
+        
+        # Maximize (phóng to) cửa sổ để load đầy đủ giao diện
+        driver.maximize_window()
+        
+        # 3. Lấy title của trang hiện tại (Đọc tiêu đề trang web)
+        actual_title = driver.title
+        # Đây là tiêu đề mình kỳ vọng (đã sửa lại thành đúng để test pass)
+        expected_title = "The Internet"
+        
+        # 4. Kiểm tra tiêu đề trang có khớp với mong đợi không
+        # Nếu không bằng thì quăng lỗi ra màn hình
+        assert actual_title == expected_title, f"Sai title rồi: nhận '{actual_title}' nhưng mong đợi '{expected_title}'"
+        print("\nSmoke test PASSED: Tiêu đề trang khớp hoàn toàn.")
+        
     finally:
-        # Luôn thực hiện khi rời khỏi khối try, kể cả khi có lỗi.
-        # Đóng toàn bộ cửa sổ thuộc phiên WebDriver và giải phóng tài nguyên.
+        # 5. Đóng trình duyệt sau khi test xong để giải phóng tài nguyên
         driver.quit()
 
-
 if __name__ == "__main__":
-    test_title_internet()
+    test_the_internet_title()
