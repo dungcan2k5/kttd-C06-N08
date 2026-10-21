@@ -23,7 +23,10 @@ def test_login_valid_credentials():
     """
 
     # 1. Khởi tạo trình duyệt Chrome và mở tối đa cửa sổ
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("detach", True)
+
+    driver = webdriver.Chrome(options=options)
     driver.maximize_window()
 
     # Đối tượng chờ tường minh: tối đa 10 giây cho mỗi điều kiện
@@ -87,7 +90,8 @@ def test_login_valid_credentials():
 
     finally:
         # 15. Đóng trình duyệt và giải phóng tài nguyên dù test pass hay fail
-        driver.quit()
+        # driver.quit()
+        pass
 
 
 if __name__ == "__main__":
