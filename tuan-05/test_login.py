@@ -90,5 +90,65 @@ def test_login_valid_credentials():
         driver.quit()
 
 
+def test_login_invalid_password():
+    """
+    Kiểm thử đăng nhập thất bại với mật khẩu sai.
+    Mục tiêu: Đảm bảo hệ thống từ chối mật khẩu không đúng và hiển thị
+    thông báo lỗi "Your password is invalid!".
+    """
+    
+    # Đường dẫn lưu ảnh chụp màn hình riêng của bạn
+    # Sẽ lưu thành tuan-05/anh/thang.png
+    thang_screenshot_path = os.path.join(os.path.dirname(__file__), "anh", "thang.png")
+    
+    # Khởi tạo trình duyệt
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option("detach", True)
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.maximize_window()
+    wait = WebDriverWait(driver, 10)
+
+    try:
+        driver.get(LOGIN_URL)
+
+        # 1. Định vị các phần tử bằng chiến lược Locator
+        username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+        password_field = driver.find_element(By.ID, "password")
+        login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+
+        # 2. Nhập dữ liệu (Username đúng, Password sai)
+        username_field.send_keys(USERNAME)
+        password_field.send_keys("WrongPassword123!")
+
+        # 3. Kích hoạt hành động đăng nhập
+        login_button.click()
+
+        # 4. Chờ và định vị thông báo lỗi flash hiển thị (chứng tỏ đăng nhập bị từ chối)
+        error_message = wait.until(EC.visibility_of_element_located((By.ID, "flash")))
+        error_text = error_message.text
+
+        # 5. Assertion: Kiểm tra thông báo lỗi có chứa đoạn text mong đợi hay không
+        # Dùng toán tử 'in' vì thẻ flash thường chứa cả nút 'x' đóng thông báo
+        assert "Your password is invalid!" in error_text, (
+            f"Kỳ vọng thấy lỗi 'Your password is invalid!' nhưng nhận được: '{error_text}'"
+        )
+
+        print("\n✅ Test PASSED: Đăng nhập thất bại hợp lệ (Bắt đúng thông báo lỗi mật khẩu)!")
+        print(f"   Error message hiện ra: {error_text.strip()}")
+
+        # 6. Lưu bằng chứng thực thi
+        os.makedirs(os.path.dirname(thang_screenshot_path), exist_ok=True)
+        driver.save_screenshot(thang_screenshot_path)
+        print(f"   Screenshot đã lưu    : {thang_screenshot_path}")
+
+    finally:
+        # driver.quit()
+        pass
+
+# Cập nhật lại phần chạy file
 if __name__ == "__main__":
+    print("--- CHẠY TEST CASE 1: ĐĂNG NHẬP THÀNH CÔNG ---")
     test_login_valid_credentials()
+    
+    print("\n--- CHẠY TEST CASE 2: SAI MẬT KHẨU ---")
+    test_login_invalid_password()
