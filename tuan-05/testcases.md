@@ -1,8 +1,8 @@
-## Test Cases – Đăng nhập
+# Test Cases – Đăng nhập
 
-### TC01 – Đăng nhập thành công với thông tin hợp lệ
+## TC01 – Đăng nhập thành công với thông tin hợp lệ
 
-# Mục tiêu: Kiểm tra người dùng có thể đăng nhập khi nhập đúng tên đăng nhập và mật khẩu.
+### Mục tiêu: Kiểm tra người dùng có thể đăng nhập khi nhập đúng tên đăng nhập và mật khẩu.
 
  - Các bước thực hiện:
    + Mở trình duyệt Chrome và truy cập trang /login.
@@ -20,9 +20,9 @@
    + Người dùng được chuyển đến trang sau đăng nhập hoặc giao diện chính theo thiết kế của ứng dụng.
    + Không xuất hiện thông báo lỗi đăng nhập.
    
-### TC02 – Đăng nhập thất bại khi sai mật khẩu
+## TC02 – Đăng nhập thất bại khi sai mật khẩu
 
-# Mục tiêu: Kiểm tra hệ thống xử lý trường hợp người dùng nhập đúng tên đăng nhập nhưng sai mật khẩu.
+### Mục tiêu: Kiểm tra hệ thống xử lý trường hợp người dùng nhập đúng tên đăng nhập nhưng sai mật khẩu.
 
  - Các bước thực hiện:
 
@@ -41,9 +41,9 @@
    + Người dùng không được chuyển đến giao diện dành cho người đã đăng nhập.
    + Giao diện hiển thị thông báo lỗi phù hợp theo thiết kế của ứng dụng.
 
-### TC03 – Đăng nhập khi bỏ trống tên đăng nhập và mật khẩu
+## TC03 – Đăng nhập khi bỏ trống tên đăng nhập và mật khẩu
 
-# Mục tiêu: Kiểm tra hệ thống xử lý khi người dùng không nhập thông tin đăng nhập.
+### Mục tiêu: Kiểm tra hệ thống xử lý khi người dùng không nhập thông tin đăng nhập.
 
   - Các bước thực hiện:
 
@@ -66,7 +66,7 @@
 
 
 
-### ID, CSS selector, XPath
+# ID, CSS selector, XPath
 - Uername:
     + XPath: //*[@id="username"]
     + id: username
