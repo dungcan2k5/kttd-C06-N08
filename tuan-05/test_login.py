@@ -1,94 +1,90 @@
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-# Đường dẫn lưu ảnh chụp màn hình bằng chứng thực thi
-SCREENSHOT_PATH = os.path.join(os.path.dirname(__file__), "anh", "tdung.png")
+# Lưu ảnh bằng chứng với tên riêng, tránh ghi đè ảnh của thành viên khác
+SCREENSHOT_PATH = os.path.join(
+    os.path.dirname(__file__), "anh", "hwng.png"
+)
 
-# URL trang đăng nhập cần kiểm thử
+# URL trang đăng nhập dùng để kiểm thử
 LOGIN_URL = "https://the-internet.herokuapp.com/login"
 
-# Thông tin đăng nhập hợp lệ (valid credentials)
-USERNAME = "tomsmith"
-PASSWORD = "SuperSecretPassword!"
+# Tài khoản không tồn tại và mật khẩu bất kỳ để kiểm tra đăng nhập thất bại
+USERNAME = "this_user_does_not_exist_123"
+PASSWORD = "AnyRandomPassword123!"
 
 
-def test_login_valid_credentials():
+def test_login_invalid_username():
     """
-    Kiểm thử đăng nhập thành công với thông tin hợp lệ.
-    Mục tiêu: Xác nhận trang /login chấp nhận đúng tài khoản,
-    chuyển hướng sang trang bảo mật và hiển thị thông báo thành công.
+    Kiểm thử đăng nhập thất bại khi username không tồn tại.
+    Mục tiêu: Xác nhận hệ thống hiển thị thông báo lỗi theo yêu cầu.
     """
 
-    # 1. Khởi tạo trình duyệt Chrome và mở tối đa cửa sổ
+    # Khởi tạo Chrome để thực hiện kiểm thử giao diện đăng nhập
     driver = webdriver.Chrome()
     driver.maximize_window()
 
-    # Đối tượng chờ tường minh: tối đa 10 giây cho mỗi điều kiện
+    # Chờ tối đa 10 giây để các phần tử cần kiểm thử xuất hiện
     wait = WebDriverWait(driver, 10)
 
     try:
-        # 2. Điều hướng trình duyệt đến trang đăng nhập
+        # Mở trang đăng nhập cần kiểm thử
         driver.get(LOGIN_URL)
 
-        # 3. Định vị trường nhập tên đăng nhập bằng thuộc tính ID
+        # Dùng ID 'username' để tìm ô nhập tên đăng nhập
         username_field = wait.until(
             EC.visibility_of_element_located((By.ID, "username"))
         )
 
-        # 4. Định vị trường nhập mật khẩu bằng thuộc tính ID
+        # Dùng ID 'password' để tìm ô nhập mật khẩu
         password_field = driver.find_element(By.ID, "password")
 
-        # 5. Định vị nút "Login" bằng CSS Selector (button kiểu submit)
-        login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
-
-        # 6. Nhập tên đăng nhập hợp lệ vào trường username
-        username_field.send_keys(USERNAME)
-
-        # 7. Nhập mật khẩu hợp lệ vào trường password
-        password_field.send_keys(PASSWORD)
-
-        # 8. Nhấn nút đăng nhập để gửi form
-        login_button.click()
-
-        # 9. Chờ cho đến khi URL thay đổi sang trang bảo mật sau đăng nhập
-        wait.until(EC.url_contains("/secure"))
-
-        # 10. Kiểm tra chuyển hướng: URL hiện tại phải chứa "/secure"
-        actual_url = driver.current_url
-        assert "/secure" in actual_url, (
-            f"Chuyển hướng thất bại: URL hiện tại là '{actual_url}', "
-            f"kỳ vọng chứa '/secure'"
+        # Dùng CSS Selector để tìm nút gửi form đăng nhập
+        login_button = driver.find_element(
+            By.CSS_SELECTOR, "button[type='submit']"
         )
 
-        # 11. Định vị thông báo flash message thành công
+        # Nhập username không tồn tại
+        username_field.send_keys(USERNAME)
+
+        # Nhập mật khẩu bất kỳ
+        password_field.send_keys(PASSWORD)
+
+        # Nhấn nút Login để gửi thông tin đăng nhập
+        login_button.click()
+
+        # Chờ thông báo lỗi xuất hiện trên trang
         flash_message = wait.until(
             EC.visibility_of_element_located((By.ID, "flash"))
         )
 
-        # 12. Lấy nội dung văn bản của thông báo flash
-        flash_text = flash_message.text
+        # Lấy nội dung thông báo lỗi để đối chiếu với yêu cầu
+        actual_message = flash_message.text
 
-        # 13. Kiểm tra thông báo hiển thị đúng nội dung đăng nhập thành công
-        assert "You logged into a secure area!" in flash_text, (
-            f"Flash message không đúng: '{flash_text}'"
+        # Xác nhận thông báo chứa đúng nội dung lỗi được yêu cầu
+        assert "Your username is invalid!" in actual_message, (
+            f"Thông báo lỗi không đúng. Nội dung thực tế: "
+            f"'{actual_message}'"
         )
 
-        print("\n✅ Test PASSED: Đăng nhập thành công!")
-        print(f"   URL sau đăng nhập : {actual_url}")
-        print(f"   Flash message      : {flash_text.strip()}")
+        print("\nTest PASSED: Hệ thống từ chối username không hợp lệ.")
+        print(f"Thông báo thực tế: {actual_message.strip()}")
 
-        # 14. Chụp ảnh màn hình làm bằng chứng thực thi và lưu vào tuan-05/anh/
+        # Tạo thư mục lưu ảnh nếu thư mục chưa tồn tại
         os.makedirs(os.path.dirname(SCREENSHOT_PATH), exist_ok=True)
+
+        # Chụp màn hình sau khi thông báo lỗi được hiển thị
         driver.save_screenshot(SCREENSHOT_PATH)
-        print(f"   Screenshot đã lưu  : {SCREENSHOT_PATH}")
+        print(f"Ảnh bằng chứng đã lưu: {SCREENSHOT_PATH}")
 
     finally:
-        # 15. Đóng trình duyệt và giải phóng tài nguyên dù test pass hay fail
+        # Luôn đóng trình duyệt kể cả khi kiểm thử xảy ra lỗi
         driver.quit()
 
 
 if __name__ == "__main__":
-    test_login_valid_credentials()
+    test_login_invalid_username()
