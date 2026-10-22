@@ -14,22 +14,19 @@ Nhóm C06-N08
 
 ### Trả lời câu hỏi đọc tài liệu:
 
-1. **Một script Selenium gồm những bước nào, và mỗi bước ứng với dòng nào trong bài kiểm thử của bạn?**
-   Theo tài liệu chuẩn Write your first Selenium script, một kịch bản kiểm thử Selenium gồm 8 bước cơ bản:
-   - Bước 1: Khởi tạo phiên làm việc với trình duyệt WebDriver. Trong bài kiểm thử, bước này ứng với dòng 24 đến dòng 26 trong fixture driver, khởi tạo trình duyệt Chrome và mở rộng toàn màn hình.
-   - Bước 2: Điều hướng đến trang web mục tiêu. Bước này ứng với dòng 42, sử dụng phương thức get để mở trang đăng nhập LOGIN_URL.
-   - Bước 3: Định vị các phần tử giao diện trên trang web. Bước này ứng với dòng 45 đến dòng 47 tìm ô tên đăng nhập, dòng 50 tìm ô mật khẩu, dòng 53 tìm nút đăng nhập.
-   - Bước 4: Thiết lập chiến lược chờ đợi phần tử sẵn sàng. Bước này ứng với dòng 39 khai báo đối tượng WebDriverWait, cùng các dòng 45 đến 47, dòng 65 và dòng 75 đến 77 chờ phần tử hiển thị hoặc URL thay đổi.
-   - Bước 5: Thao tác tương tác với phần tử. Bước này ứng với dòng 56 điền tên đăng nhập, dòng 59 điền mật khẩu, dòng 62 nhấn chuột vào nút đăng nhập.
-   - Bước 6: Lấy thông tin trạng thái từ trang web. Bước này ứng với dòng 68 lấy địa chỉ URL hiện tại của trình duyệt, dòng 79 đến dòng 80 đọc nội dung văn bản của thông báo flash.
-   - Bước 7: Kiểm tra kết quả thực tế với kết quả mong đợi. Bước này ứng với dòng 69 đến dòng 72 kiểm tra URL chuyển hướng sang secure, dòng 83 đến dòng 85 kiểm tra thông báo đăng nhập thành công bằng câu lệnh assert.
-   - Bước 8: Đóng phiên làm việc và giải phóng tài nguyên trình duyệt. Bước này ứng với dòng 28 trong fixture driver, tự động gọi lệnh quit sau khi hoàn thành ca kiểm thử.
+1. **Với ô tên đăng nhập ở trang /login, nên xác định bằng cách nào là ổn định nhất, vì sao?**
+   - Cách xác định ổn định và tối ưu nhất là sử dụng thuộc tính ID thông qua bộ định vị By.ID với giá trị username.
+   - Lý do: Thuộc tính id theo tiêu chuẩn HTML là định danh duy nhất của phần tử trên toàn bộ trang web. Trên trang /login, trường nhập tài khoản có id="username" rất rõ ràng. Định vị bằng id mang lại tốc độ thực thi nhanh nhất do trình duyệt có cơ chế tối ưu riêng, đồng thời có tính bền vững cao nhất vì không bị ảnh hưởng nếu cấu trúc phân cấp thẻ bọc ngoài hoặc kiểu dáng CSS của giao diện thay đổi.
 
-2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
-   pytest tự động khám phá các bài kiểm thử trong dự án dựa trên 3 quy tắc đặt tên chuẩn sau:
-   - Tên tệp kiểm thử: Phải bắt đầu bằng tiền tố test_ hoặc kết thúc bằng hậu tố _test.py. Ví dụ trong bài là tệp test_login.py.
-   - Tên lớp kiểm thử: Nếu gom nhóm bằng lớp thì tên lớp phải bắt đầu bằng từ khóa Test và lớp đó không được chứa hàm khởi tạo init.
-   - Tên hàm kiểm thử: Các hàm kiểm thử bên ngoài hoặc bên trong lớp phải luôn bắt đầu bằng tiền tố test_, ví dụ hàm test_login_valid_credentials, hàm test_login_invalid_password, hàm test_login_invalid_username.
+2. **Muốn nhập chữ vào một ô thì dùng lệnh gì?**
+   - Muốn nhập chữ vào một ô nhập liệu trên trang web, ta sử dụng phương thức send_keys trên phần tử đã định vị được.
+   - Cú pháp thực hiện: gọi phương thức send_keys trên phần tử và truyền vào chuỗi nội dung cần nhập. Ví dụ trong bài kiểm thử: username_field gọi send_keys với giá trị USERNAME. Trước khi nhập dữ liệu mới, nếu ô nhập đã có sẵn giá trị mặc định thì có thể gọi thêm phương thức clear để xóa sạch nội dung cũ.
+
+3. **Làm thế nào để biết id của một ô nhập trên trang?**
+   - Bước 1: Mở công cụ DevTools trên trình duyệt Chrome bằng cách nhấn phím F12 hoặc bấm chuột phải vào trang web rồi chọn mục Inspect hay Kiểm tra.
+   - Bước 2: Bấm vào biểu tượng con trỏ chuột chọn phần tử ở góc trên bên trái cửa sổ DevTools hoặc dùng tổ hợp phím Ctrl + Shift + C.
+   - Bước 3: Di chuyển chuột và nhấp trực tiếp vào ô nhập liệu cần kiểm tra trên màn hình trình duyệt.
+   - Bước 4: Quan sát thẻ input đang được bôi đậm trong tab Elements của DevTools, tìm thuộc tính id và đọc giá trị nằm trong cặp dấu ngoặc kép sau id=, ví dụ id="username".
 
 ### Ghi chú sử dụng AI
 - Câu hỏi đã hỏi AI: Làm thế nào để viết một fixture Pytest chuẩn quản lý việc mở và đóng trình duyệt Chrome cho cả 3 ca kiểm thử đăng nhập?
@@ -49,22 +46,19 @@ Nhóm C06-N08
 
 ### Trả lời câu hỏi đọc tài liệu:
 
-1. **Một script Selenium gồm những bước nào, và mỗi bước ứng với dòng nào trong bài kiểm thử của bạn?**
-   Dựa trên tài liệu hướng dẫn viết script Selenium đầu tiên, kịch bản gồm 8 bước được ánh xạ vào bài kiểm thử trong tệp test_login.py:
-   - Bước 1: Khởi tạo phiên trình duyệt WebDriver, ứng với dòng 24 đến dòng 26 của fixture driver.
-   - Bước 2: Truy cập trang web cần kiểm thử, ứng với dòng 42 mở địa chỉ trang đăng nhập.
-   - Bước 3: Định vị các phần tử form trên trang, ứng với dòng 45 đến 47 tìm trường username theo id, dòng 50 tìm trường password theo id, dòng 53 tìm nút submit bằng CSS Selector button[type='submit'].
-   - Bước 4: Chờ phần tử sẵn sàng tương tác, ứng với dòng 39 thiết lập thời gian chờ tối đa 10 giây, dòng 46 chờ ô nhập liệu xuất hiện.
-   - Bước 5: Thực hiện các hành động nhập và bấm nút, ứng với dòng 56 điền tài khoản, dòng 59 điền mật khẩu, dòng 62 kích hoạt sự kiện bấm nút đăng nhập.
-   - Bước 6: Trích xuất dữ liệu thực tế sau tương tác, ứng với dòng 68 lấy URL sau chuyển hướng và dòng 80 lấy nội dung phản hồi từ thông báo flash.
-   - Bước 7: Khẳng định tính chính xác của kết quả, ứng với các dòng lệnh assert từ dòng 69 đến 72 và dòng 83 đến 85 so sánh dữ liệu thực tế với kết quả mong đợi.
-   - Bước 8: Kết thúc phiên làm việc của trình duyệt, ứng với dòng 28 gọi lệnh quit để đóng cửa sổ Chrome.
+1. **Với ô tên đăng nhập ở trang /login, nên xác định bằng cách nào là ổn định nhất, vì sao?**
+   - Xác định bằng By.ID với thuộc tính id="username" là phương án ổn định và an toàn nhất.
+   - Lý do: Thuộc tính id là duy nhất trên trang, giúp WebDriver tìm kiếm trực tiếp và chính xác tuyệt đối mà không sợ nhầm lẫn với bất kỳ phần tử nào khác. So với XPath tương đối hay bộ chọn CSS, định vị theo id ít bị ảnh hưởng nhất khi giao diện web cập nhật thêm các thẻ cha bọc ngoài.
 
-2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
-   pytest nhận diện bài kiểm thử một cách tự động khi tuân thủ đúng quy ước đặt tên:
-   - Tệp mã nguồn kiểm thử: Bắt đầu bằng test_ như test_login.py hoặc kết thúc bằng _test.py.
-   - Lớp kiểm thử: Bắt đầu bằng chữ Test viết hoa chữ T đầu tiên và không có hàm khởi tạo init.
-   - Hàm kiểm thử: Phải bắt đầu bằng tiền tố test_ viết thường, ví dụ test_login_valid_credentials hoặc test_login_invalid_password. Mọi hàm không bắt đầu bằng tiền tố này sẽ bị pytest bỏ qua.
+2. **Muốn nhập chữ vào một ô thì dùng lệnh gì?**
+   - Để nhập chữ vào một ô nhập liệu, câu lệnh chuẩn trong Selenium WebDriver là phương thức send_keys.
+   - Minh họa trong mã nguồn: tìm phần tử theo By.ID với giá trị username rồi gọi lệnh send_keys với chuỗi tomsmith. Lệnh này mô phỏng hành động gõ từng phím của người dùng vào ô đang được chọn.
+
+3. **Làm thế nào để biết id của một ô nhập trên trang?**
+   - Bước 1: Mở giao diện lập trình DevTools bằng cách nhấn F12 trên bàn phím.
+   - Bước 2: Kích hoạt công cụ soi phần tử bằng cách bấm vào biểu tượng mũi tên góc trái tab Elements.
+   - Bước 3: Nhấp chuột vào ô nhập tên đăng nhập trên form giao diện.
+   - Bước 4: Nhìn vào đoạn mã HTML tương ứng được làm nổi bật trên cây cấu trúc DOM, tìm thuộc tính id="username" để lấy chính xác giá trị định danh của ô đó.
 
 ### Ghi chú sử dụng AI
 - Câu hỏi đã hỏi AI: Hướng dẫn viết bảng đặc tả trường hợp kiểm thử cho form đăng nhập và so sánh độ ổn định giữa bộ chọn CSS Selector và đường dẫn XPath tương đối.
@@ -84,22 +78,19 @@ Nhóm C06-N08
 
 ### Trả lời câu hỏi đọc tài liệu:
 
-1. **Một script Selenium gồm những bước nào, và mỗi bước ứng với dòng nào trong bài kiểm thử của bạn?**
-   Theo tài liệu Write your first Selenium script, bài kiểm thử đăng nhập hợp lệ test_login_valid_credentials thực hiện đầy đủ 8 bước sau:
-   - Bước 1: Khởi tạo trình duyệt WebDriver, được thiết lập tại dòng 24 đến dòng 26 trong fixture driver chung của tệp.
-   - Bước 2: Điều hướng đến trang web mục tiêu, ứng với dòng 42 gọi lệnh driver.get mở trang đăng nhập.
-   - Bước 3: Định vị phần tử trên trang, ứng với dòng 45 đến 47 định vị ô nhập tên đăng nhập bằng ID username, dòng 50 định vị ô mật khẩu bằng ID password, dòng 53 định vị nút đăng nhập bằng CSS Selector.
-   - Bước 4: Thiết lập chiến lược chờ đợi, ứng với dòng 39 tạo bộ chờ WebDriverWait 10 giây, dòng 46 chờ ô username hiển thị, dòng 65 chờ URL chứa đường dẫn secure, dòng 76 chờ thông báo flash xuất hiện.
-   - Bước 5: Thực hiện thao tác người dùng, ứng với dòng 56 điền tên đăng nhập tomsmith, dòng 59 điền mật khẩu hợp lệ, dòng 62 bấm nút gửi form đăng nhập.
-   - Bước 6: Lấy thông tin phản hồi từ giao diện, ứng với dòng 68 đọc đường dẫn URL hiện tại và dòng 80 lấy chuỗi văn bản của thông báo flash.
-   - Bước 7: Kiểm tra kết quả thực tế với mong đợi, ứng với dòng 69 đến 72 assert URL chứa chuỗi secure, dòng 83 đến 85 assert thông báo flash chứa nội dung đăng nhập thành công.
-   - Bước 8: Kết thúc phiên làm việc, ứng với dòng 28 đóng trình duyệt Chrome sau khi hoàn thành bài test.
+1. **Với ô tên đăng nhập ở trang /login, nên xác định bằng cách nào là ổn định nhất, vì sao?**
+   - Nên dùng By.ID để xác định ô tên đăng nhập với giá trị là username.
+   - Lý do: Thuộc tính id có tính độc nhất trong tài liệu HTML của trang. Khi dùng By.ID, thời gian tìm kiếm của trình duyệt là tức thời. Ngược lại, nếu dùng XPath hoặc CSS Selector phức tạp, script dễ bị sai khi cấu trúc phân cấp trang bị chỉnh sửa. Do đó id luôn là lựa chọn ưu tiên số một về độ ổn định.
 
-2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
-   Cơ chế tìm kiếm tự động của pytest dựa trên các tiền tố và hậu tố quy ước:
-   - Tên file: Bắt đầu bằng test_ hoặc kết thúc bằng _test.py. Trong dự án, tệp chứa mã kiểm thử được đặt tên là test_login.py nên pytest tự động quét được.
-   - Tên class: Bắt đầu bằng Test nếu tổ chức bài kiểm thử theo hướng đối tượng.
-   - Tên function: Bắt đầu bằng chữ test_ viết thường. Ví dụ bài kiểm thử đăng nhập thành công được đặt tên là test_login_valid_credentials, giúp pytest nhận diện chính xác đây là một bài kiểm thử cần chạy.
+2. **Muốn nhập chữ vào một ô thì dùng lệnh gì?**
+   - Dùng phương thức send_keys truyền vào chuỗi ký tự muốn điền.
+   - Ví dụ trong bài kiểm thử đăng nhập hợp lệ: gọi phương thức send_keys của biến username_field với giá trị USERNAME. Lệnh này sẽ truyền văn bản tài khoản tomsmith vào ô nhập liệu đã được định vị trước đó.
+
+3. **Làm thế nào để biết id của một ô nhập trên trang?**
+   - Bước 1: Mở trình duyệt Chrome tại trang đăng nhập, nhấn phím F12 để mở bảng điều khiển DevTools.
+   - Bước 2: Nhấn vào biểu tượng trỏ phần tử ở góc trên bên trái DevTools.
+   - Bước 3: Di chuột tới ô nhập và nhấn chuột trái.
+   - Bước 4: Tại cửa sổ Elements, xem dòng mã nguồn thẻ input, quan sát thuộc tính id để lấy chuỗi định danh được đặt bên trong dấu nháy kép.
 
 ### Ghi chú sử dụng AI
 - Câu hỏi đã hỏi AI: Tại sao khi kiểm tra chuyển hướng sau khi đăng nhập cần dùng WebDriverWait chờ URL thay đổi mà không nên đọc ngay thuộc tính current_url?
@@ -119,22 +110,18 @@ Nhóm C06-N08
 
 ### Trả lời câu hỏi đọc tài liệu:
 
-1. **Một script Selenium gồm những bước nào, và mỗi bước ứng với dòng nào trong bài kiểm thử của bạn?**
-   Theo tài liệu Write your first Selenium script, bài kiểm thử trường hợp sai mật khẩu test_login_invalid_password gồm 8 bước cụ thể:
-   - Bước 1: Khởi tạo phiên làm việc WebDriver, ứng với dòng 24 đến dòng 26 trong fixture driver dùng chung.
-   - Bước 2: Điều hướng tới trang web kiểm thử, ứng với dòng 108 gọi lệnh mở địa chỉ URL trang đăng nhập.
-   - Bước 3: Định vị các trường dữ liệu và nút bấm, ứng với dòng 111 tìm trường tên đăng nhập, dòng 112 tìm trường mật khẩu, dòng 113 tìm nút bấm submit.
-   - Bước 4: Thiết lập cơ chế chờ đợi, ứng với dòng 105 khởi tạo bộ chờ 10 giây, dòng 111 chờ ô tên đăng nhập sẵn sàng hiển thị, dòng 123 chờ thông báo lỗi flash xuất hiện.
-   - Bước 5: Thực hiện nhập liệu và gửi biểu mẫu, ứng với dòng 116 nhập tên đăng nhập tomsmith, dòng 117 nhập mật khẩu sai WrongPassword123!, dòng 120 nhấn nút đăng nhập.
-   - Bước 6: Lấy thông tin phản hồi từ trang web, ứng với dòng 124 trích xuất văn bản từ thông báo lỗi flash.
-   - Bước 7: Kiểm tra khẳng định kết quả mong đợi, ứng với dòng 127 đến dòng 129 dùng assert xác nhận thông báo lỗi chứa đoạn văn bản Your password is invalid!.
-   - Bước 8: Kết thúc phiên làm việc, ứng với dòng 28 đóng trình duyệt và dọn dẹp bộ nhớ máy tính.
+1. **Với ô tên đăng nhập ở trang /login, nên xác định bằng cách nào là ổn định nhất, vì sao?**
+   - Xác định bằng By.ID với thuộc tính id="username" là phương án ổn định nhất.
+   - Lý do: Thuộc tính id được gắn duy nhất cho phần tử này trên trang web. Sử dụng id giúp script chạy nhanh, định vị chuẩn xác và không bị gãy khi lập trình viên cập nhật lại các thuộc tính kiểu dáng như class hay thay đổi vị trí của phần tử trong cây DOM.
 
-2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
-   pytest áp dụng quy tắc đặt tên nhất quán để khám phá các bài kiểm thử:
-   - Quy tắc đặt tên file: Tệp phải có tên bắt đầu bằng test_ hoặc có đuôi là _test.py.
-   - Quy tắc đặt tên class: Lớp chứa bài kiểm thử phải có tên bắt đầu bằng Test và không sử dụng hàm khởi tạo init.
-   - Quy tắc đặt tên hàm: Hàm thực thi kiểm thử phải bắt đầu bằng chữ test_, ví dụ hàm test_login_invalid_password. Nhờ tiền tố test_ này, khi gọi lệnh pytest từ dòng lệnh, công cụ sẽ tự động nạp và thực thi hàm này.
+2. **Muốn nhập chữ vào một ô thì dùng lệnh gì?**
+   - Lệnh được dùng là phương thức send_keys của phần tử Selenium WebElement.
+   - Ví dụ áp dụng: gọi phương thức send_keys của biến password_field với chuỗi WrongPassword123!. Câu lệnh này sẽ đưa chuỗi mật khẩu sai vào trường nhập mật khẩu để kiểm thử kịch bản đăng nhập thất bại.
+
+3. **Làm thế nào để biết id của một ô nhập trên trang?**
+   - Bước 1: Nhấp chuột phải trực tiếp vào ô nhập liệu cần xem rồi chọn mục Kiểm tra hoặc Inspect trên menu ngữ cảnh.
+   - Bước 2: Cửa sổ DevTools tự động mở ra và nhảy thẳng tới dòng mã HTML đại diện cho ô nhập đó.
+   - Bước 3: Đọc thuộc tính id hiển thị trong thẻ input, giá trị của thuộc tính này chính là id cần tìm để đưa vào mã kiểm thử.
 
 ### Ghi chú sử dụng AI
 - Câu hỏi đã hỏi AI: Làm cách nào để kiểm tra thông báo lỗi hiển thị trong thẻ flash khi thẻ này chứa cả ký tự nút đóng thông báo?
@@ -154,22 +141,19 @@ Nhóm C06-N08
 
 ### Trả lời câu hỏi đọc tài liệu:
 
-1. **Một script Selenium gồm những bước nào, và mỗi bước ứng với dòng nào trong bài kiểm thử của bạn?**
-   Theo hướng dẫn chuẩn Write your first Selenium script, bài kiểm thử sai tên đăng nhập test_login_invalid_username được cấu thành từ 8 bước sau:
-   - Bước 1: Khởi tạo phiên làm việc với trình duyệt WebDriver, ứng với dòng 24 đến dòng 26 trong fixture driver.
-   - Bước 2: Điều hướng đến trang web mục tiêu, ứng với dòng 154 mở trang đăng nhập bằng lệnh driver.get.
-   - Bước 3: Định vị các phần tử trên trang, ứng với dòng 157 đến 159 định vị ô tên đăng nhập, dòng 162 định vị ô mật khẩu, dòng 165 đến 167 định vị nút đăng nhập bằng CSS Selector.
-   - Bước 4: Thiết lập chiến lược chờ đợi phần tử, ứng với dòng 147 tạo WebDriverWait, dòng 158 chờ ô nhập tên xuất hiện, dòng 179 đến 181 chờ thông báo lỗi xuất hiện trên màn hình.
-   - Bước 5: Thao tác gửi dữ liệu và gửi biểu mẫu, ứng với dòng 170 điền tên người dùng không tồn tại, dòng 173 điền mật khẩu bất kỳ, dòng 176 nhấn nút đăng nhập.
-   - Bước 6: Lấy thông tin phản hồi, ứng với dòng 184 đọc văn bản từ thẻ thông báo flash.
-   - Bước 7: Khẳng định tính đúng đắn của kết quả, ứng với dòng 187 đến dòng 189 kiểm tra thông báo lỗi có chứa chuỗi Your username is invalid! bằng assert.
-   - Bước 8: Kết thúc phiên làm việc, ứng với dòng 28 tự động giải phóng trình duyệt và tiến trình liên quan.
+1. **Với ô tên đăng nhập ở trang /login, nên xác định bằng cách nào là ổn định nhất, vì sao?**
+   - Nên xác định bằng cách dùng thuộc tính ID với bộ chọn By.ID giá trị username.
+   - Lý do: ID luôn là bộ định vị có độ ưu tiên cao nhất trong kiểm thử tự động vì tính duy nhất trên toàn trang HTML. Việc dùng ID giúp tốc độ tìm kiếm của WebDriver đạt mức nhanh nhất và bài kiểm thử hoạt động ổn định nhất, không bị phụ thuộc vào các đường dẫn cấu trúc phức tạp như XPath.
 
-2. **pytest tự tìm bài kiểm thử dựa vào quy tắc đặt tên nào?**
-   pytest nhận biết và thu thập các bài kiểm thử thông qua các chuẩn đặt tên sau:
-   - Chuẩn đặt tên file: Bắt đầu bằng test_ hoặc kết thúc bằng _test.py, chẳng hạn tệp test_login.py.
-   - Chuẩn đặt tên class: Lớp nhóm bài kiểm thử bắt đầu bằng Test và không định nghĩa hàm init.
-   - Chuẩn đặt tên hàm: Hàm bài kiểm thử bắt buộc phải bắt đầu bằng test_, chẳng hạn hàm test_login_invalid_username. Nếu đặt tên không có tiền tố này, pytest sẽ xem như hàm trợ giúp thông thường và bỏ qua không thực thi.
+2. **Muốn nhập chữ vào một ô thì dùng lệnh gì?**
+   - Lệnh dùng để nhập chữ vào một ô là phương thức send_keys.
+   - Ví dụ trong mã nguồn: gọi phương thức send_keys của biến username_field với giá trị invalid_username. Lệnh này sẽ mô phỏng việc gõ chuỗi tên người dùng không tồn tại vào ô tài khoản.
+
+3. **Làm thế nào để biết id của một ô nhập trên trang?**
+   - Bước 1: Bấm phím F12 để mở công cụ DevTools của trình duyệt Chrome.
+   - Bước 2: Bấm vào nút có biểu tượng mũi tên chọn phần tử ở góc trên bên trái khung DevTools.
+   - Bước 3: Bấm chuột vào ô nhập liệu cần kiểm tra trên giao diện trang web.
+   - Bước 4: Xem đoạn mã HTML tương ứng trong cây phần tử ở tab Elements, tìm từ khóa id và lấy giá trị nằm sau dấu bằng.
 
 ### Ghi chú sử dụng AI
 - Câu hỏi đã hỏi AI: Làm cách nào để script tự động tạo thư mục ảnh nếu thư mục đó chưa tồn tại nhằm tránh lỗi đường dẫn khi lưu ảnh màn hình?
