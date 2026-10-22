@@ -14,7 +14,6 @@ LOGIN_URL = "https://the-internet.herokuapp.com/login"
 USERNAME = "tomsmith"
 PASSWORD = "SuperSecretPassword!"
 
-
 def test_login_valid_credentials():
     """
     Kiểm thử đăng nhập thành công với thông tin hợp lệ.
@@ -152,3 +151,75 @@ if __name__ == "__main__":
     
     print("\n--- CHẠY TEST CASE 2: SAI MẬT KHẨU ---")
     test_login_invalid_password()
+
+
+def test_login_invalid_username():
+    """
+    Kiểm thử đăng nhập thất bại với username không tồn tại.
+    Mục tiêu: Xác nhận hệ thống hiển thị thông báo lỗi theo yêu cầu.
+    """
+
+    # Khởi tạo Chrome và phóng to cửa sổ trình duyệt
+    driver = webdriver.Chrome()
+    driver.maximize_window()
+
+    # Chờ tối đa 10 giây để các phần tử cần thiết xuất hiện
+    wait = WebDriverWait(driver, 10)
+
+    # Lưu ảnh bằng chứng riêng cho bài test của mình
+    screenshot_path = os.path.join(
+        os.path.dirname(__file__), "anh", "hung.png"
+    )
+
+    # Dùng username không tồn tại và mật khẩu bất kỳ
+    invalid_username = "this_user_does_not_exist_123"
+    arbitrary_password = "AnyRandomPassword123!"
+
+    try:
+        # Mở trang đăng nhập
+        driver.get(LOGIN_URL)
+
+        # Dùng ID để định vị ô nhập username
+        username_field = wait.until(
+            EC.visibility_of_element_located((By.ID, "username"))
+        )
+
+        # Dùng ID để định vị ô nhập password
+        password_field = driver.find_element(By.ID, "password")
+
+        # Dùng CSS Selector để định vị nút Login
+        login_button = driver.find_element(
+            By.CSS_SELECTOR, "button[type='submit']"
+        )
+
+        # Nhập username không tồn tại
+        username_field.send_keys(invalid_username)
+
+        # Nhập mật khẩu bất kỳ
+        password_field.send_keys(arbitrary_password)
+
+        # Nhấn Login để gửi thông tin đăng nhập
+        login_button.click()
+
+        # Chờ thông báo lỗi xuất hiện
+        flash_message = wait.until(
+            EC.visibility_of_element_located((By.ID, "flash"))
+        )
+
+        # Lấy nội dung thông báo để kiểm tra
+        actual_message = flash_message.text
+
+        # Xác nhận thông báo chứa đúng nội dung theo yêu cầu
+        assert "Your username is invalid!" in actual_message, (
+            f"Thông báo lỗi không đúng: '{actual_message}'"
+        )
+
+        # Tạo thư mục ảnh nếu chưa tồn tại
+        os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
+
+        # Chụp màn hình thông báo lỗi làm bằng chứng thực thi
+        driver.save_screenshot(screenshot_path)
+
+    finally:
+        # Đóng trình duyệt kể cả khi test thất bại
+        driver.quit()
