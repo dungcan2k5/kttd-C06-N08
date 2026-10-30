@@ -13,7 +13,7 @@ def driver():
     yield driver
     # Đóng trình duyệt sau khi test xong
 
-    time.sleep(30)
+    # time.sleep(30)
     driver.quit()
 
 def test_checkbox_happy_path(driver):
