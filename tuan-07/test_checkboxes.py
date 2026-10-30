@@ -1,21 +1,3 @@
-import pytest
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-
-@pytest.fixture
-def driver():
-    # Khởi tạo trình duyệt Chrome
-    driver = webdriver.Chrome()
-    driver.maximize_window()
-    yield driver
-    # Đóng trình duyệt sau khi test xong
-
-    # time.sleep(30)
-    driver.quit()
-
 def test_checkbox_happy_path(driver):
     # 1. Truy cập trang web
     url = "https://the-internet.herokuapp.com/checkboxes"
