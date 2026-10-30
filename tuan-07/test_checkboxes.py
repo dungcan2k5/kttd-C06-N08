@@ -18,7 +18,6 @@ def test_checkbox_happy_path(driver):
     # 4. Kiểm tra trạng thái mặc định trước khi thao tác
     assert not checkbox_1.is_selected(), "Lỗi: Checkbox 1 mặc định phải ở trạng thái chưa chọn"
     assert checkbox_2.is_selected(), "Lỗi: Checkbox 2 mặc định phải ở trạng thái đã chọn"
-
     # 5. Thực hiện thao tác: Click để đảo ngược trạng thái
     checkbox_1.click()
     checkbox_2.click()
