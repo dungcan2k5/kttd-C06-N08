@@ -7,14 +7,14 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def test_upload_invalid_file_fail_case():
     """
-    Test case (Fail): Kiểm thử tính năng Upload file trên trang The Internet.
+    Test case (Fail): Cố tình upload file sai định dạng (.exe).
     Sử dụng Explicit Wait, không dùng time.sleep().
-    Kết quả: Bắt buộc FAILED do cố tình assert kỳ vọng sai kết quả trả về.
+    Kết quả: FAILED do hệ thống không chặn file lỗi (trang The Internet nhận mọi file).
     """
-    # Bước 1: Tạo một file .txt giả ở local để upload
-    test_file_path = os.path.abspath("unsupported_format.txt")
+    # Bước 1: Tạo một file không hợp lệ (.exe) để test "invalid input" theo đúng đề bài
+    test_file_path = os.path.abspath("virus_gia.exe")
     with open(test_file_path, "w") as f:
-        f.write("Day la file text de test chuc nang upload.")
+        f.write("Day la file exe dung de test invalid input.")
 
     # Bước 2: Khởi tạo trình duyệt
     driver = webdriver.Chrome()
@@ -22,30 +22,30 @@ def test_upload_invalid_file_fail_case():
     wait = WebDriverWait(driver, 5)
 
     try:
-        # Bước 3: Điều hướng đến trang Upload của The Internet
+        # Bước 3: Điều hướng đến trang Upload 
         driver.get("https://the-internet.herokuapp.com/upload")
 
-        # Bước 4: Tìm thẻ input file và nút submit dựa theo ID của trang The Internet
+        # Bước 4: Tìm thẻ input file và nút submit 
         file_input = wait.until(EC.presence_of_element_located((By.ID, "file-upload")))
         upload_button = wait.until(EC.element_to_be_clickable((By.ID, "file-submit")))
 
-        # Bước 5: Truyền đường dẫn file tuyệt đối vào thẻ input
+        # Bước 5: Truyền đường dẫn file .exe (invalid input) vào
         file_input.send_keys(test_file_path)
 
         # Bước 6: Bấm nút upload
         upload_button.click()
 
-        # Bước 7: Chờ thẻ h3 chứa kết quả xuất hiện
-        # Trang này khi upload xong sẽ hiện một thẻ h3 có chữ "File Uploaded!"
+        # Bước 7: Chờ phần tử chứa kết quả hiển thị
         result_message = wait.until(EC.presence_of_element_located((By.TAG_NAME, "h3")))
 
-        # Bước 8: Cố tình Assert sai để test case FAILED
-        # Sự thật là file up thành công, nhưng ta kỳ vọng nó phải quăng ra lỗi từ chối
-        assert result_message.text == "Lỗi định dạng file!", \
-            f"LỖI CỐ TÌNH: Web trả về '{result_message.text}' nhưng test lại kỳ vọng báo lỗi!"
+        # Bước 8: Kiểm tra thông báo lỗi (Assert the error message)
+        # Đưa vào file .exe, ta KỲ VỌNG web phải chặn và báo lỗi "Unsupported file format"
+        # NHƯNG thực tế web lại hiện "File Uploaded!" -> Lệnh assert này sẽ gây ra lỗi FAILED
+        assert result_message.text == "Unsupported file format", \
+            f"LỖI: Đưa vào file .exe nhưng web không chặn, lại báo '{result_message.text}'"
 
     finally:
-        # Bước 9: Dọn dẹp - Đóng trình duyệt và xóa file giả
+        # Bước 9: Dọn dẹp
         driver.quit()
         if os.path.exists(test_file_path):
             os.remove(test_file_path)
