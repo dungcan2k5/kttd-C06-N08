@@ -10,7 +10,7 @@ def driver():
     driver = webdriver.Chrome()
     driver.implicitly_wait(10) # Thiết lập Implicit Wait 10 giây
     yield driver
-    # Đóng trình duyệt sau khi kiểm thử hoàn tất
+    # Đóng trình duyệt sau khi kiểm thử đã hoàn tất
     driver.quit()
 
 def test_upload_file_invalid(driver):
