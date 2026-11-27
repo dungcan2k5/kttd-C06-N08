@@ -5,10 +5,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+# URL trang tải tệp lên cần kiểm thử
+UPLOAD_URL = "https://the-internet.herokuapp.com/upload"
+
 @pytest.fixture
 def driver():
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(10)
+    """
+    Test harness fixture: Khởi tạo và giải phóng WebDriver (Setup & Teardown).
+    - Setup: Khởi tạo Chrome WebDriver và phóng to cửa sổ trình duyệt.
+    - Teardown: Đảm bảo driver.quit() luôn được gọi sau khi hoàn thành test case
+      (kể cả khi test pass hoặc fail) để tránh rò rỉ tiến trình browser.
+    """
+    chrome_options = webdriver.ChromeOptions()
+    # Tự bật headless trên Linux/Codespaces/CI khi không có màn hình GUI
+    if os.name != "nt" and not os.getenv("DISPLAY"):
+        chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    driver = webdriver.Chrome(options=chrome_options)
     yield driver
     driver.quit()
 
@@ -23,74 +38,67 @@ def test_upload_file_invalid(driver):
     )
     upload_button.click()
     
-    # Bước 3: Chờ cho đến khi URL thay đổi hoặc nội dung trang báo lỗi xuất hiện
-    wait.until(lambda d: "Internal Server Error" in d.page_source or "No file was chosen" in d.page_source)
+    # Bước 3: Chờ thông báo lỗi đặc trưng của trang sau submit hiển thị
+    error_detail = wait.until(
+        EC.visibility_of_element_located((By.ID, "upload-error"))
+    )
+    error_heading = wait.until(
+        EC.visibility_of_element_located((By.TAG_NAME, "h3"))
+    )
+
+    # Bước 4: Xác nhận tiêu đề và chi tiết lỗi (Negative Test)
+    assert "Internal Server Error" in error_heading.text, (
+        f"Tiêu đề lỗi không đúng: '{error_heading.text}'"
+    )
+    assert "No file was chosen" in error_detail.text, (
+        f"Nội dung lỗi không đúng: '{error_detail.text}'"
+    )
+
+@pytest.mark.xfail(
+    reason="App bug: trang /upload khong kiem tra va chan dinh dang file .exe",
+    strict=True,
+)
+def test_upload_invalid_file_fail_case(driver, tmp_path):
+    """
+    Test case (XFail): Kiểm thử upload file sai định dạng (.exe).
+    - Dùng fixture `driver` (đã có teardown driver.quit()) và `tmp_path` để tránh rác ở thư mục gốc.
+    - Sử dụng Explicit Wait (WebDriverWait + expected_conditions), không dùng time.sleep().
+    - Kỳ vọng hệ thống chặn file .exe, nhưng thực tế web vẫn báo "File Uploaded!" (App Bug),
+      nên gắn @pytest.mark.xfail(strict=True) để bộ test 3x chạy sạch mà vẫn ghi nhận lỗi.
+    """
+    # Bước 1: Tạo file giả lập định dạng .exe trong thư mục tạm tmp_path của pytest
+    invalid_file = tmp_path / "virus_gia.exe"
+    invalid_file.write_text("Day la file exe dung de test invalid input.", encoding="utf-8")
+
+    # Bước 2: Khởi tạo Explicit Wait (chờ tối đa 10 giây, đồng bộ toàn bộ suite)
+    wait = WebDriverWait(driver, 10)
+
+    # Bước 3: Điều hướng đến trang Upload
+    driver.get(UPLOAD_URL)
+
+    # Bước 4: Chờ thẻ input file xuất hiện và nút submit sẵn sàng để click
+    file_input = wait.until(
+        EC.presence_of_element_located((By.ID, "file-upload"))
+    )
+    upload_button = wait.until(
+        EC.element_to_be_clickable((By.ID, "file-submit"))
+    )
+
+    # Bước 5: Truyền đường dẫn file .exe vào input rồi bấm Upload
+    file_input.send_keys(str(invalid_file))
+    upload_button.click()
+
+    # Bước 6: Chờ tiêu đề kết quả hiển thị trên giao diện
+    result_message = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, "h3"))
+    )
+
+    # Bước 7: Kiểm tra kỳ vọng (web phải chặn và báo lỗi thay vì cho upload thành công)
+    assert result_message.text.strip() == "Unsupported file format", (
+        f"LỖI ỨNG DỤNG: Đưa vào file .exe nhưng web không chặn, "
+        f"lại báo '{result_message.text.strip()}'"
+    )
     
-    # Bước 4: Xác nhận thông báo lỗi xuất hiện đúng như dự kiến (Negative Test)
-    assert "Internal Server Error" in driver.page_source or "No file was chosen" in driver.page_source, \
-        "Không tìm thấy thông báo lỗi khi upload file rỗng!"
-def test_upload_invalid_file_fail_case():
-    """
-    Test case (Fail): Cố tình upload file sai định dạng (.exe).
-    Sử dụng Explicit Wait, không dùng time.sleep().
-    Kết quả: FAILED do hệ thống không chặn file lỗi (trang The Internet nhận mọi file).
-    """
-    # Bước 1: Tạo một file không hợp lệ (.exe) để test "invalid input" theo đúng đề bài
-    test_file_path = os.path.abspath("virus_gia.exe")
-    with open(test_file_path, "w") as f:
-        f.write("Day la file exe dung de test invalid input.")
-
-    # Bước 2: Khởi tạo trình duyệt
-    driver = webdriver.Chrome()
-    driver.maximize_window()
-    wait = WebDriverWait(driver, 5)
-
-    try:
-        # Bước 3: Điều hướng đến trang Upload 
-        driver.get("https://the-internet.herokuapp.com/upload")
-
-        # Bước 4: Tìm thẻ input file và nút submit 
-        file_input = wait.until(EC.presence_of_element_located((By.ID, "file-upload")))
-        upload_button = wait.until(EC.element_to_be_clickable((By.ID, "file-submit")))
-
-        # Bước 5: Truyền đường dẫn file .exe (invalid input) vào
-        file_input.send_keys(test_file_path)
-
-        # Bước 6: Bấm nút upload
-        upload_button.click()
-
-        # Bước 7: Chờ phần tử chứa kết quả hiển thị
-        result_message = wait.until(EC.presence_of_element_located((By.TAG_NAME, "h3")))
-
-        # Bước 8: Kiểm tra thông báo lỗi (Assert the error message)
-        # Đưa vào file .exe, ta KỲ VỌNG web phải chặn và báo lỗi "Unsupported file format"
-        # NHƯNG thực tế web lại hiện "File Uploaded!" -> Lệnh assert này sẽ gây ra lỗi FAILED
-        assert result_message.text == "Unsupported file format", \
-            f"LỖI: Đưa vào file .exe nhưng web không chặn, lại báo '{result_message.text}'"
-
-    finally:
-        # Bước 9: Dọn dẹp
-        driver.quit()
-        if os.path.exists(test_file_path):
-            os.remove(test_file_path)
-# URL trang tải tệp lên cần kiểm thử
-UPLOAD_URL = "https://the-internet.herokuapp.com/upload"
-
-
-@pytest.fixture
-def driver():
-    """
-    Test harness fixture: Khởi tạo và giải phóng WebDriver (Setup & Teardown).
-    - Setup: Khởi tạo Chrome WebDriver và phóng to cửa sổ trình duyệt.
-    - Teardown: Đảm bảo driver.quit() luôn được gọi sau khi hoàn thành test case
-      (kể cả khi test pass hoặc fail) để tránh rò rỉ tiến trình browser.
-    """
-    chrome_options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.maximize_window()
-    yield driver
-    driver.quit()
-
 
 def test_upload_valid_file(driver, tmp_path):
     """
@@ -123,7 +131,7 @@ def test_upload_valid_file(driver, tmp_path):
     file_input.send_keys(file_path)
 
     # Bước 4: Định vị và nhấn nút "Upload" để gửi tệp lên máy chủ
-    upload_button = driver.find_element(By.ID, "file-submit")
+    upload_button = wait.until(EC.element_to_be_clickable((By.ID, "file-submit")))
     upload_button.click()
 
     # Bước 5: Chờ trang kết quả xuất hiện - đợi tiêu đề thành công hiển thị
@@ -156,3 +164,42 @@ def test_upload_valid_file(driver, tmp_path):
     print("\nTest PASSED: Tai tep len thanh cong!")
     print(f"   Tep da tai len     : {actual_filename}")
     print(f"   Thong bao ket qua  : {success_heading.text}")
+
+@pytest.mark.xfail(reason="App bug: /upload khong chan tep rong 0 byte", strict=True) 
+def test_upload_empty_file(driver, tmp_path):
+    """
+    Negative/Edge case: Kiểm thử tải lên tệp rỗng (0 byte).
+    Mục tiêu: Xác nhận hệ thống xử lý và không chấp nhận tệp không có nội dung.
+    """
+    # Bước 1: Tạo tệp rỗng 0 byte trong thư mục tạm tmp_path
+    empty_file = tmp_path / "empty_file.txt"
+    empty_file.write_bytes(b"")
+    assert empty_file.stat().st_size == 0
+
+    wait = WebDriverWait(driver, 10)
+
+    # Bước 2: Mở trang upload
+    driver.get(UPLOAD_URL)
+
+    # Bước 3: Chờ ô chọn tệp xuất hiện và truyền đường dẫn tệp rỗng
+    file_input = wait.until(
+        EC.presence_of_element_located((By.ID, "file-upload"))
+    )
+    file_input.send_keys(str(empty_file))
+
+    # Bước 4: Chờ nút Upload sẵn sàng để click và gửi form
+    upload_button = wait.until(
+        EC.element_to_be_clickable((By.ID, "file-submit"))
+    )
+    upload_button.click()
+
+    # Bước 5: Chờ tiêu đề kết quả hiển thị trên giao diện (h3 hoặc h1 nếu lỗi server)
+    result_heading = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, "h3, h1"))
+    )
+    heading_text = result_heading.text.strip()
+
+    # Bước 6: Kiểm tra hệ thống từ chối tệp rỗng (không báo thành công)
+    assert "File Uploaded!" not in heading_text, (
+        f"LỖI: Hệ thống vẫn cho phép tải lên tệp rỗng 0 byte ('{heading_text}')"
+    )
