@@ -22,8 +22,13 @@ def driver():
       (kể cả khi test pass hoặc fail) để tránh rò rỉ tiến trình browser.
     """
     chrome_options = webdriver.ChromeOptions()
+    # Tự bật headless trên Linux/Codespaces/CI khi không có màn hình GUI
+    if os.name != "nt" and not os.getenv("DISPLAY"):
+        chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
     driver = webdriver.Chrome(options=chrome_options)
-    driver.maximize_window()
     yield driver
     driver.quit()
 
@@ -47,10 +52,12 @@ def test_login_valid_credentials(driver):
     )
 
     # 3. Định vị trường nhập mật khẩu bằng thuộc tính ID
-    password_field = driver.find_element(By.ID, "password")
+    # password_field = driver.find_element(By.ID, "password")
+    password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
 
     # 4. Định vị nút "Login" bằng CSS Selector (button kiểu submit)
-    login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    # login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
 
     # 5. Nhập tên đăng nhập hợp lệ vào trường username
     username_field.send_keys(USERNAME)
@@ -109,8 +116,10 @@ def test_login_invalid_password(driver):
 
     # 2. Định vị các phần tử bằng chiến lược Locator
     username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
-    password_field = driver.find_element(By.ID, "password")
-    login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    # password_field = driver.find_element(By.ID, "password")
+    # login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
+    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
 
     # 3. Nhập dữ liệu (Username đúng, Password sai)
     username_field.send_keys(USERNAME)
@@ -159,12 +168,14 @@ def test_login_invalid_username(driver):
     )
 
     # 3. Dùng ID để định vị ô nhập password
-    password_field = driver.find_element(By.ID, "password")
+    # password_field = driver.find_element(By.ID, "password")
+    password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
 
     # 4. Dùng CSS Selector để định vị nút Login
-    login_button = driver.find_element(
-        By.CSS_SELECTOR, "button[type='submit']"
-    )
+    # login_button = driver.find_element(
+    #     By.CSS_SELECTOR, "button[type='submit']"
+    # )
+    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
 
     # 5. Nhập username không tồn tại
     username_field.send_keys(invalid_username)
@@ -196,6 +207,77 @@ def test_login_invalid_username(driver):
     driver.save_screenshot(screenshot_path)
     print(f"   Screenshot đã lưu    : {screenshot_path}")
 
+def test_login_empty_credentials(driver):
+    """
+    TC03 (Negative): Kiểm thử đăng nhập khi bỏ trống cả username và password.
+    Mục tiêu: Đảm bảo hệ thống từ chối đăng nhập, giữ nguyên ở trang /login
+    và hiển thị thông báo lỗi "Your username is invalid!".
+    """
+    wait = WebDriverWait(driver, 10)
+
+    # 1. Điều hướng đến trang đăng nhập
+    driver.get(LOGIN_URL)
+
+    # 2. Chờ các ô nhập liệu và nút Login sẵn sàng (không nhập dữ liệu)
+    username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+    password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
+    login_button = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))
+    )
+
+    # Đảm bảo cả hai ô đều trống rồi nhấn Login
+    username_field.clear()
+    password_field.clear()
+    login_button.click()
+
+    # 3. Chờ thông báo lỗi #flash hiển thị
+    flash_message = wait.until(EC.visibility_of_element_located((By.ID, "flash")))
+    actual_message = flash_message.text
+
+    # 4. Kiểm tra vẫn ở trang /login và hiển thị đúng thông báo lỗi
+    assert "/login" in driver.current_url, (
+        f"Kỳ vọng vẫn ở '/login' nhưng URL hiện tại là '{driver.current_url}'"
+    )
+    assert "Your username is invalid!" in actual_message, (
+        f"Thông báo lỗi không đúng: '{actual_message}'"
+    )
+
+
+def test_login_empty_password(driver):
+    """
+    TC04 (Negative): Kiểm thử đăng nhập khi nhập đúng username nhưng bỏ trống password.
+    Mục tiêu: Đảm bảo hệ thống không cho đăng nhập, giữ nguyên ở trang /login
+    và hiển thị thông báo lỗi "Your password is invalid!".
+    """
+    wait = WebDriverWait(driver, 10)
+
+    # 1. Điều hướng đến trang đăng nhập
+    driver.get(LOGIN_URL)
+
+    # 2. Chờ ô username, password và nút Login sẵn sàng
+    username_field = wait.until(EC.visibility_of_element_located((By.ID, "username")))
+    password_field = wait.until(EC.visibility_of_element_located((By.ID, "password")))
+    login_button = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))
+    )
+
+    # 3. Nhập username hợp lệ, để trống password rồi nhấn Login
+    username_field.clear()
+    username_field.send_keys(USERNAME)
+    password_field.clear()
+    login_button.click()
+
+    # 4. Chờ thông báo lỗi #flash hiển thị
+    flash_message = wait.until(EC.visibility_of_element_located((By.ID, "flash")))
+    actual_message = flash_message.text
+
+    # 5. Kiểm tra vẫn ở trang /login và hiển thị đúng thông báo lỗi
+    assert "/login" in driver.current_url, (
+        f"Kỳ vọng vẫn ở '/login' nhưng URL hiện tại là '{driver.current_url}'"
+    )
+    assert "Your password is invalid!" in actual_message, (
+        f"Thông báo lỗi không đúng: '{actual_message}'"
+    )
 
 if __name__ == "__main__":
     pytest.main(["-v", "-s", __file__])
