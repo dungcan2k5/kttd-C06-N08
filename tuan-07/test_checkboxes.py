@@ -37,7 +37,7 @@ def test_checkboxes_fail_case_invalid_action(driver):
 
     # Bước 4: Kiểm tra trạng thái
     # Test sẽ FAILED ngay tại đây vì kỳ vọng là True nhưng thực tế là False
-    assert checkbox_1.is_selected(), "LỖI CỐ TÌNH: Thao tác sai (click 2 lần) khiến Checkbox 1 không giữ được trạng thái chọn!"
+    assert not checkbox_1.is_selected(), "Checkbox 1 phải trở về trạng thái chưa chọn sau khi click 2 lần!"
 
 def test_checkbox_happy_path(driver):
     # 1. Truy cập trang web
@@ -50,7 +50,7 @@ def test_checkbox_happy_path(driver):
     # 3. Chờ cho đến khi các checkbox xuất hiện trên DOM
     # Thay thế hoàn toàn cho time.sleep(). Script sẽ chạy tiếp ngay khi element sẵn sàng.
     checkboxes = wait.until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "input[type='checkbox']"))
+        EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "input[type='checkbox']"))
     )
     
     checkbox_1 = checkboxes[0]
