@@ -12,37 +12,33 @@ from selenium.webdriver.support import expected_conditions as EC
 BASE_URL = "https://the-internet.herokuapp.com"
 @pytest.fixture
 def driver():
-    # Khởi tạo Chrome Options để cấu hình trình duyệt.
-    options = webdriver.ChromeOptions()
+    chrome_options = webdriver.ChromeOptions()
 
-    # Bật Headless Mode mặc định để hỗ trợ CI và máy Linux không có màn hình.
-    # Có thể thay đổi chế độ chạy thông qua biến môi trường HEADLESS.
-    headless = os.getenv("HEADLESS", "true").lower() == "true"
+    # Tự động bật Headless Mode trên Linux/Codespaces/CI
+    # khi môi trường không có màn hình GUI (không có DISPLAY).
+    if os.name != "nt" and not os.getenv("DISPLAY"):
+        chrome_options.add_argument("--headless=new")
 
-    if headless:
-        options.add_argument("--headless=new")
+    # Các tùy chọn hỗ trợ Chrome chạy ổn định trong môi trường CI/Linux.
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # Thiết lập kích thước màn hình cho trình duyệt.
-    options.add_argument("--window-size=1920,1080")
-
-    # Các tùy chọn hỗ trợ Chrome chạy ổn định trong môi trường Linux/CI.
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
+    # Thiết lập kích thước cửa sổ trình duyệt.
+    chrome_options.add_argument("--window-size=1920,1080")
 
     # Bật Performance Log để theo dõi HTTP response.
-    options.set_capability(
+    chrome_options.set_capability(
         "goog:loggingPrefs",
         {"performance": "ALL"}
     )
 
-    # Khởi tạo Chrome WebDriver.
-    browser = webdriver.Chrome(options=options)
+    browser = webdriver.Chrome(options=chrome_options)
 
     yield browser
 
-    # Đóng trình duyệt sau khi test kết thúc.
+    # Đóng trình duyệt sau khi mỗi test kết thúc.
     browser.quit()
+
 
 
 
